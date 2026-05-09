@@ -1,6 +1,8 @@
-import { Box, Typography, Chip } from "@mui/material";
+import { Box, Typography, Chip, IconButton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const CATEGORY_COLORS = {
     default: { bg: "rgba(0,230,118,0.08)", color: "#00e676" },
@@ -15,7 +17,7 @@ function getCategoryStyle(name) {
     return CATEGORY_COLORS[key] || CATEGORY_COLORS.default;
 }
 
-export default function GastoList({ gastos }) {
+export default function GastoList({ gastos, onEdit, onDelete }) {
     const theme = useTheme();
     const isDark = theme.palette.mode === "dark";
 
@@ -33,7 +35,13 @@ export default function GastoList({ gastos }) {
                 }}
             >
                 <Typography sx={{ fontSize: "36px" }}>🧾</Typography>
-                <Typography sx={{ color: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.3)", fontSize: "14px", fontFamily: "'DM Sans', sans-serif" }}>
+                <Typography
+                    sx={{
+                        color: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.3)",
+                        fontSize: "14px",
+                        fontFamily: "'DM Sans', sans-serif",
+                    }}
+                >
                     No hay gastos registrados
                 </Typography>
             </Box>
@@ -44,6 +52,7 @@ export default function GastoList({ gastos }) {
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
             {gastos.map((g) => {
                 const style = getCategoryStyle(g.categoria);
+
                 return (
                     <Box
                         key={g.id}
@@ -51,6 +60,7 @@ export default function GastoList({ gastos }) {
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
+                            gap: 2,
                             px: 2.5,
                             py: 2,
                             borderRadius: "14px",
@@ -64,7 +74,7 @@ export default function GastoList({ gastos }) {
                             },
                         }}
                     >
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 2, flex: 1 }}>
                             <Box
                                 sx={{
                                     width: 40,
@@ -111,17 +121,49 @@ export default function GastoList({ gastos }) {
                             </Box>
                         </Box>
 
-                        <Typography
-                            sx={{
-                                color: "#ff6d6d",
-                                fontWeight: 700,
-                                fontSize: "16px",
-                                fontFamily: "'DM Sans', sans-serif",
-                                letterSpacing: "-0.01em",
-                            }}
-                        >
-                            -${Number(g.monto).toLocaleString()}
-                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Typography
+                                sx={{
+                                    color: "#ff6d6d",
+                                    fontWeight: 700,
+                                    fontSize: "16px",
+                                    fontFamily: "'DM Sans', sans-serif",
+                                    letterSpacing: "-0.01em",
+                                    minWidth: 90,
+                                    textAlign: "right",
+                                }}
+                            >
+                                -${Number(g.monto).toLocaleString()}
+                            </Typography>
+
+                            <IconButton
+                                onClick={() => onEdit(g)}
+                                size="small"
+                                sx={{
+                                    color: "#ffd740",
+                                    background: "rgba(255,215,64,0.08)",
+                                    "&:hover": {
+                                        background: "rgba(255,215,64,0.16)",
+                                    },
+                                }}
+                            >
+                                <EditIcon fontSize="small" />
+                            </IconButton>
+
+                            <IconButton
+                                onClick={() => onDelete(g.id)}
+                                size="small"
+                                sx={{
+                                    color: "#ff6d6d",
+                                    background: "rgba(255,109,109,0.08)",
+                                    "&:hover": {
+                                        background: "rgba(255,109,109,0.16)",
+                                    },
+                                }}
+                            >
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </Box>
                     </Box>
                 );
             })}

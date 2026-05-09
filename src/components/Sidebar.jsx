@@ -22,6 +22,7 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import CategoryIcon from "@mui/icons-material/Category";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import GroupsIcon from "@mui/icons-material/Groups";
+import AnalyticsIcon from "@mui/icons-material/Analytics";
 
 const drawerWidth = 260;
 
@@ -38,6 +39,11 @@ export default function Sidebar() {
     ];
 
     const adminItems = [
+        {
+            label: "Resumen admin",
+            path: "/admin/resumen",
+            icon: <AnalyticsIcon fontSize="small" />,
+        },
         {
             label: "Gastos por usuario",
             path: "/admin/gastos",
@@ -188,7 +194,7 @@ export default function Sidebar() {
                             fontFamily: "'DM Sans', sans-serif",
                         }}
                     >
-                        Finanzas Pro
+                        Gestion de Gastos
                     </Typography>
 
                     <Typography

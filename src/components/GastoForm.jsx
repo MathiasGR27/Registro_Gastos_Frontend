@@ -3,10 +3,44 @@ import api from "../api/api";
 import { TextField, Button, Box, MenuItem, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
+import SaveIcon from "@mui/icons-material/Save";
+import CloseIcon from "@mui/icons-material/Close";
 
-export default function GastoForm({ reload }) {
+export default function GastoForm({ reload, gastoEditando, cancelarEdicion }) {
     const theme = useTheme();
     const isDark = theme.palette.mode === "dark";
+
+    const [form, setForm] = useState({
+        categoria_id: "",
+        monto: "",
+        descripcion: "",
+    });
+
+    const [categorias, setCategorias] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        api.get("/categorias")
+            .then((res) => setCategorias(res.data))
+            .catch((err) => console.error("Error cargando categorías:", err));
+    }, []);
+
+    useEffect(() => {
+        if (gastoEditando) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setForm({
+                categoria_id: gastoEditando.categoria_id || "",
+                monto: gastoEditando.monto || "",
+                descripcion: gastoEditando.descripcion || "",
+            });
+        } else {
+            setForm({
+                categoria_id: "",
+                monto: "",
+                descripcion: "",
+            });
+        }
+    }, [gastoEditando]);
 
     const fieldSx = {
         "& .MuiInputBase-root": {
@@ -25,7 +59,9 @@ export default function GastoForm({ reload }) {
             fontFamily: "'DM Sans', sans-serif",
         },
         "& .MuiInputLabel-root.Mui-focused": { color: "#00e676" },
-        "& .MuiSelect-icon": { color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" },
+        "& .MuiSelect-icon": {
+            color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
+        },
     };
 
     const menuPaperSx = {
@@ -38,41 +74,59 @@ export default function GastoForm({ reload }) {
                     color: isDark ? "rgba(255,255,255,0.7)" : "#0d0d1a",
                     fontSize: "13px",
                     fontFamily: "'DM Sans', sans-serif",
-                    "&:hover": { background: "rgba(0,230,118,0.08)", color: "#00c853" },
+                    "&:hover": {
+                        background: "rgba(0,230,118,0.08)",
+                        color: "#00c853",
+                    },
                 },
             },
         },
     };
-    const [form, setForm] = useState({
-    categoria_id: "",
-    monto: "",
-    descripcion: ""
-    });
-    const [categorias, setCategorias] = useState([]);
-    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        api.get("/categorias").then((res) => setCategorias(res.data));
-    }, []);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    const handleSubmit = async () => {
-        if (!form.categoria_id || !form.monto) return;
+        if (!form.categoria_id || !form.monto) {
+            alert("Selecciona una categoría y escribe un monto");
+            return;
+        }
+
         setLoading(true);
-        await api.post("/gastos", form);
-        setForm({ ...form, categoria_id: "", monto: "", descripcion: "" });
-        setLoading(false);
-        reload();
+
+        try {
+            if (gastoEditando) {
+                await api.put(`/gastos/${gastoEditando.id}`, form);
+            } else {
+                await api.post("/gastos", form);
+            }
+
+            setForm({
+                categoria_id: "",
+                monto: "",
+                descripcion: "",
+            });
+
+            if (cancelarEdicion) cancelarEdicion();
+
+            await reload();
+        } catch (err) {
+            console.error("Error guardando gasto:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <Box
+            component="form"
+            onSubmit={handleSubmit}
             sx={{
                 p: 3,
                 borderRadius: "20px",
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.07)",
                 mb: 4,
                 position: "relative",
+                background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+                border: isDark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.08)",
                 "&::before": {
                     content: '""',
                     position: "absolute",
@@ -81,10 +135,10 @@ export default function GastoForm({ reload }) {
                     right: 0,
                     height: "2px",
                     borderRadius: "20px 20px 0 0",
-                    background: "linear-gradient(90deg, transparent, rgba(0,230,118,0.5), transparent)",
+                    background: gastoEditando
+                        ? "linear-gradient(90deg, transparent, rgba(255,215,64,0.6), transparent)"
+                        : "linear-gradient(90deg, transparent, rgba(0,230,118,0.5), transparent)",
                 },
-                background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-                border: isDark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.08)",
             }}
         >
             <Typography
@@ -98,10 +152,17 @@ export default function GastoForm({ reload }) {
                     fontFamily: "'DM Sans', sans-serif",
                 }}
             >
-                Nuevo gasto
+                {gastoEditando ? "Editar gasto" : "Nuevo gasto"}
             </Typography>
 
-            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", alignItems: "flex-end" }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    gap: 2,
+                    flexWrap: "wrap",
+                    alignItems: "flex-end",
+                }}
+            >
                 <TextField
                     select
                     size="small"
@@ -136,30 +197,49 @@ export default function GastoForm({ reload }) {
                 />
 
                 <Button
+                    type="submit"
                     variant="contained"
-                    onClick={handleSubmit}
                     disabled={loading}
-                    startIcon={<AddIcon />}
+                    startIcon={gastoEditando ? <SaveIcon /> : <AddIcon />}
                     sx={{
                         borderRadius: "12px",
-                        background: "linear-gradient(135deg, #00e676, #00bfa5)",
+                        background: gastoEditando
+                            ? "linear-gradient(135deg, #ffd740, #ffb300)"
+                            : "linear-gradient(135deg, #00e676, #00bfa5)",
                         color: "#000",
                         fontWeight: 700,
                         fontSize: "13px",
                         px: 3,
                         py: 1,
                         height: "40px",
-                        boxShadow: "0 4px 20px rgba(0,230,118,0.25)",
-                        "&:hover": {
-                            background: "linear-gradient(135deg, #00ff85, #00d4b1)",
-                            boxShadow: "0 6px 25px rgba(0,230,118,0.4)",
-                        },
                         fontFamily: "'DM Sans', sans-serif",
                         whiteSpace: "nowrap",
                     }}
                 >
-                    {loading ? "Guardando..." : "Guardar"}
+                    {loading
+                        ? "Guardando..."
+                        : gastoEditando
+                            ? "Actualizar"
+                            : "Guardar"}
                 </Button>
+
+                {gastoEditando && (
+                    <Button
+                        variant="outlined"
+                        onClick={cancelarEdicion}
+                        startIcon={<CloseIcon />}
+                        sx={{
+                            borderRadius: "12px",
+                            height: "40px",
+                            color: "text.secondary",
+                            border: isDark
+                                ? "1px solid rgba(255,255,255,0.15)"
+                                : "1px solid rgba(0,0,0,0.15)",
+                        }}
+                    >
+                        Cancelar
+                    </Button>
+                )}
             </Box>
         </Box>
     );

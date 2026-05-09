@@ -10,6 +10,8 @@ import GastoList from "../components/GastoList";
 export default function Gastos() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [gastoEditando, setGastoEditando] = useState(null);
+
     const theme = useTheme();
     const isDark = theme.palette.mode === "dark";
 
@@ -33,8 +35,31 @@ export default function Gastos() {
     }, []);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         load();
     }, [load]);
+
+    const handleEdit = (gasto) => {
+        setGastoEditando(gasto);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handleCancelEdit = () => {
+        setGastoEditando(null);
+    };
+
+    const handleDelete = async (id) => {
+        const confirmar = confirm("¿Seguro que deseas eliminar este gasto?");
+
+        if (!confirmar) return;
+
+        try {
+            await api.delete(`/gastos/${id}`);
+            await load();
+        } catch (err) {
+            console.error("Error eliminando gasto:", err);
+        }
+    };
 
     const gastos = data?.gastos || [];
     const total = gastos.reduce((acc, g) => acc + Number(g.monto), 0);
@@ -113,7 +138,11 @@ export default function Gastos() {
                 </Box>
             </Box>
 
-            <GastoForm reload={load} />
+            <GastoForm
+                reload={load}
+                gastoEditando={gastoEditando}
+                cancelarEdicion={handleCancelEdit}
+            />
 
             <Box>
                 <Box
@@ -165,7 +194,11 @@ export default function Gastos() {
                         ))}
                     </Box>
                 ) : (
-                    <GastoList gastos={gastos} />
+                    <GastoList
+                        gastos={gastos}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
                 )}
             </Box>
         </Layout>

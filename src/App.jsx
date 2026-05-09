@@ -9,6 +9,7 @@ import Gastos from "./pages/Gastos";
 import AdminGastos from "./pages/AdminGastos";
 import AdminCategorias from "./pages/AdminCategorias";
 import CrearAdmin from "./pages/CrearAdmin";
+import AdminResumen from "./pages/AdminResumen";
 
 import PrivateRoute from "./routes/PrivateRoute";
 import RoleRoute from "./routes/RoleRoute";
@@ -49,6 +50,11 @@ function App() {
                         <Route path="/admin/crear-admin" element={
                             <RoleRoute allowedRoles={["admin"]}>
                                 <CrearAdmin />
+                            </RoleRoute>
+                        } />
+                        <Route path="/admin/resumen" element={
+                            <RoleRoute allowedRoles={["admin"]}>
+                                <AdminResumen />
                             </RoleRoute>
                         } />
                     </Routes>
