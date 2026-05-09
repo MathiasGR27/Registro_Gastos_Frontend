@@ -4,10 +4,12 @@ import { Grid, Box, Typography, Skeleton } from "@mui/material";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
-
+import PresupuestoCard from "../components/PresupuestoCard";
 import Layout from "../components/Layout";
 import DateFilter from "../components/DateFilter";
 import Charts from "../components/Charts";
+import DownloadIcon from "@mui/icons-material/Download";
+import Button from "@mui/material/Button";
 
 function StatCard({ icon, label, value, accent, sub }) {
     return (
@@ -97,6 +99,30 @@ function StatCard({ icon, label, value, accent, sub }) {
     );
 }
 
+const exportarPDF = async () => {
+    try {
+        const res = await api.get("/gastos/export/pdf", {
+            responseType: "blob",
+        });
+
+        const url = window.URL.createObjectURL(new Blob([res.data]));
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.setAttribute("download", "reporte-gastos.pdf");
+
+        document.body.appendChild(link);
+        link.click();
+
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error("Error exportando PDF:", error);
+        alert("No se pudo exportar el PDF");
+    }
+};
+
 export default function Dashboard() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -138,6 +164,9 @@ export default function Dashboard() {
 
     const promedio = hayDatos ? (total / data.gastos.length).toFixed(2) : 0;
 
+    const alertaPresupuesto =
+    data?.plugins?.find((p) => p.plugin === "presupuesto")?.result || null;
+
     return (
         <Layout>
             <Box sx={{ mb: 5 }}>
@@ -164,7 +193,40 @@ export default function Dashboard() {
                 </Typography>
             </Box>
 
+            <Box sx={{ mb: 3 }}>
+
+    <Button
+        startIcon={<DownloadIcon />}
+    onClick={exportarPDF}
+     sx={{
+            borderRadius: "14px",
+            background:
+                "linear-gradient(135deg,#00e676,#00bfa5)",
+            color: "#000",
+            fontWeight: 700,
+            px: 3,
+            py: 1.2,
+            boxShadow:
+                "0 4px 20px rgba(0,230,118,0.25)",
+
+            "&:hover": {
+                background:
+                    "linear-gradient(135deg,#00ff88,#00d4b1)",
+            }
+        }}
+        variant="contained"
+    >
+        Exportar PDF
+    </Button>
+
+</Box>
+
             <DateFilter onFilter={load} />
+
+            <PresupuestoCard
+                alerta={alertaPresupuesto}
+                reload={load}
+            />
 
             {loading && (
                 <Grid container spacing={3}>

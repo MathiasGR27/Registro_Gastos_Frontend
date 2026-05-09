@@ -23,6 +23,7 @@ import CategoryIcon from "@mui/icons-material/Category";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import GroupsIcon from "@mui/icons-material/Groups";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
+import PersonIcon from "@mui/icons-material/Person";
 
 const drawerWidth = 260;
 
@@ -36,6 +37,7 @@ export default function Sidebar() {
     const navItems = [
         { label: "Dashboard", path: "/", icon: <DashboardIcon fontSize="small" /> },
         { label: "Gastos", path: "/gastos", icon: <ReceiptLongIcon fontSize="small" /> },
+        { label: "Perfil", path: "/perfil", icon: <PersonIcon fontSize="small" /> },
     ];
 
     const adminItems = [
