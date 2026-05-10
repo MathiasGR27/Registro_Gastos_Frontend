@@ -165,7 +165,7 @@ export default function Dashboard() {
     const promedio = hayDatos ? (total / data.gastos.length).toFixed(2) : 0;
 
     const alertaPresupuesto =
-    data?.plugins?.find((p) => p.plugin === "presupuesto")?.result || null;
+        data?.plugins?.find((p) => p.plugin === "presupuesto")?.result || null;
 
     return (
         <Layout>
@@ -195,31 +195,31 @@ export default function Dashboard() {
 
             <Box sx={{ mb: 3 }}>
 
-    <Button
-        startIcon={<DownloadIcon />}
-    onClick={exportarPDF}
-     sx={{
-            borderRadius: "14px",
-            background:
-                "linear-gradient(135deg,#00e676,#00bfa5)",
-            color: "#000",
-            fontWeight: 700,
-            px: 3,
-            py: 1.2,
-            boxShadow:
-                "0 4px 20px rgba(0,230,118,0.25)",
+                <Button
+                    startIcon={<DownloadIcon />}
+                    onClick={exportarPDF}
+                    sx={{
+                        borderRadius: "14px",
+                        background:
+                            "linear-gradient(135deg,#00e676,#00bfa5)",
+                        color: "#000",
+                        fontWeight: 700,
+                        px: 3,
+                        py: 1.2,
+                        boxShadow:
+                            "0 4px 20px rgba(0,230,118,0.25)",
 
-            "&:hover": {
-                background:
-                    "linear-gradient(135deg,#00ff88,#00d4b1)",
-            }
-        }}
-        variant="contained"
-    >
-        Exportar PDF
-    </Button>
+                        "&:hover": {
+                            background:
+                                "linear-gradient(135deg,#00ff88,#00d4b1)",
+                        }
+                    }}
+                    variant="contained"
+                >
+                    Exportar PDF
+                </Button>
 
-</Box>
+            </Box>
 
             <DateFilter onFilter={load} />
 
