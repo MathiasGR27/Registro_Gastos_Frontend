@@ -315,16 +315,16 @@ Restringe acceso según rol.
 
 # Características Principales
 
-Dashboard moderno
-Arquitectura modular
-Tema oscuro/claro
-Gestión financiera
-Roles y permisos
-Gráficos dinámicos
-Exportación PDF
-Presupuestos
-Alertas financieras
-Perfil personalizado
+* Dashboard moderno
+* Arquitectura modular
+* Tema oscuro/claro
+* Gestión financiera
+* Roles y permisos
+* Gráficos dinámicos
+* Exportación PDF
+* Presupuestos
+* Alertas financieras
+* Perfil personalizado
 
 ---
 
